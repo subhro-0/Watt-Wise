@@ -1,0 +1,16 @@
+# Secrets & API Keys
+.env
+.env*
+*.env
+!.env.example
+
+# Python cache & build
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Local SQLite databases
+*.db
+*.sqlite3
+watt_wise.db
