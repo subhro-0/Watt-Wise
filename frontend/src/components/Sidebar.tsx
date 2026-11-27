@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "dashboard" as PageId, label: "Dashboard", icon: LayoutDashboard },
     { id: "appliances" as PageId, label: "My Appliances", icon: Tv },
     { id: "analytics" as PageId, label: "Energy Analytics", icon: BarChart3 },
-    { id: "ai-assistant" as PageId, label: "AI Energy Assistant", icon: Bot, badge: "Gemini" },
+    { id: "ai-assistant" as PageId, label: "AI Energy Assistant", icon: Bot },
     { id: "carbon-tracker" as PageId, label: "Carbon Tracker", icon: Leaf },
     { id: "bill-estimator" as PageId, label: "Bill Estimator", icon: ReceiptText },
     { id: "goals" as PageId, label: "Saving Goals", icon: Target },
@@ -129,12 +129,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {item.badge && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/80 text-emerald-800">
-                        {item.badge}
-                      </span>
-                    )}
-
                     {item.count && item.count > 0 ? (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white min-w-5 text-center">
                         {item.count}
