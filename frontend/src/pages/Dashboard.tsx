@@ -59,7 +59,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const primaryGoal = goals[0];
   const goalProgressPct = primaryGoal
-    ? Math.min(100, Math.round((primaryGoal.currentKwh / primaryGoal.targetKwh) * 100))
+    ? Math.min(100, Math.round((totalKwh / primaryGoal.targetKwh) * 100))
     : 0;
 
   return (
@@ -109,7 +109,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <span className="inline-flex items-center gap-1 font-bold text-emerald-600">
               <TrendingDown className="w-3.5 h-3.5" /> 8.4% lower
             </span>
-            <span className="text-slate-400">Target: 500 kWh</span>
+            <span className="text-slate-400">
+              Target: {primaryGoal ? `${primaryGoal.targetKwh} kWh` : "500 kWh"}
+            </span>
           </div>
         </div>
 
@@ -364,13 +366,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <>
                 <h5 className="text-sm font-bold text-slate-900 mb-1">{primaryGoal.title}</h5>
                 <p className="text-xs text-slate-500 mb-3">
-                  Target: {primaryGoal.targetKwh} kWh • Used: {primaryGoal.currentKwh} kWh
+                  Target: {primaryGoal.targetKwh} kWh • Used: {totalKwh} kWh
                 </p>
 
                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-2">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
-                      goalProgressPct > 100 ? "bg-amber-500" : "bg-emerald-500"
+                      totalKwh > primaryGoal.targetKwh ? "bg-amber-500" : "bg-emerald-500"
                     }`}
                     style={{ width: `${Math.min(100, goalProgressPct)}%` }}
                   />
@@ -378,10 +380,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                 <div className="flex items-center justify-between text-xs text-slate-600 font-medium">
                   <span>{goalProgressPct}% of budget used</span>
-                  <span className={goalProgressPct > 100 ? "text-amber-600 font-bold" : "text-emerald-600 font-bold"}>
-                    {primaryGoal.targetKwh - primaryGoal.currentKwh > 0
-                      ? `${primaryGoal.targetKwh - primaryGoal.currentKwh} kWh left`
-                      : `+${Math.abs(primaryGoal.targetKwh - primaryGoal.currentKwh)} kWh over`}
+                  <span className={totalKwh > primaryGoal.targetKwh ? "text-amber-600 font-bold" : "text-emerald-600 font-bold"}>
+                    {primaryGoal.targetKwh - totalKwh > 0
+                      ? `${Math.round(primaryGoal.targetKwh - totalKwh)} kWh left`
+                      : `+${Math.round(totalKwh - primaryGoal.targetKwh)} kWh over`}
                   </span>
                 </div>
               </>

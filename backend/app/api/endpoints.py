@@ -159,7 +159,17 @@ def get_carbon_summary(kwh: float = Query(531.0), factor: Optional[float] = None
 # ==========================================
 @router.get("/goals", response_model=List[GoalResponse])
 def get_goals(db: Session = Depends(get_db)):
-    return db.query(Goal).all()
+    appliances = db.query(Appliance).all()
+    current_kwh = sum(a.monthly_kwh for a in appliances) if appliances else 0.0
+    bill_calc = calculate_slab_bill(current_kwh)
+
+    goals = db.query(Goal).all()
+    for g in goals:
+        g.current_kwh = round(current_kwh, 1)
+        g.current_bill_inr = bill_calc["total_bill_inr"]
+        g.achieved = (current_kwh <= g.target_kwh) if g.target_kwh > 0 else False
+    db.commit()
+    return goals
 
 @router.post("/goals", response_model=GoalResponse, status_code=status.HTTP_201_CREATED)
 def create_goal(goal: GoalCreate, db: Session = Depends(get_db)):

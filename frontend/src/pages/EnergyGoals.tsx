@@ -27,8 +27,8 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [targetKwh, setTargetKwh] = useState(480);
-  const [targetBill, setTargetBill] = useState(3000);
+  const [targetKwh, setTargetKwh] = useState(currentKwh > 0 ? Math.round(currentKwh * 0.85) : 440);
+  const [targetBill, setTargetBill] = useState(currentBillInr > 0 ? Math.round(currentBillInr * 0.85) : 2800);
   const [targetMonth, setTargetMonth] = useState("December 2026");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -106,8 +106,10 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
         </h4>
 
         {goals.map((g) => {
-          const progressPct = Math.round((g.currentKwh / g.targetKwh) * 100);
-          const isOver = g.currentKwh > g.targetKwh;
+          const effectiveCurrentKwh = currentKwh > 0 ? currentKwh : g.currentKwh;
+          const progressPct = Math.round((effectiveCurrentKwh / g.targetKwh) * 100);
+          const isOver = effectiveCurrentKwh > g.targetKwh;
+          const isAchieved = effectiveCurrentKwh <= g.targetKwh;
 
           return (
             <div
@@ -118,10 +120,10 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-3 rounded-xl ${
-                      g.achieved ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-800"
+                      isAchieved ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
                     }`}
                   >
-                    {g.achieved ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Target className="w-5 h-5 text-emerald-600" />}
+                    {isAchieved ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Target className="w-5 h-5 text-amber-600" />}
                   </div>
                   <div>
                     <h5 className="text-sm font-bold text-slate-900">{g.title}</h5>
@@ -134,7 +136,7 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
                 <div className="text-right">
                   <span className="text-xs font-bold text-slate-500 uppercase block">Current vs Target</span>
                   <span className="text-sm font-black text-slate-900">
-                    {g.currentKwh} / {g.targetKwh} kWh
+                    {effectiveCurrentKwh} / {g.targetKwh} kWh
                   </span>
                 </div>
               </div>
@@ -144,7 +146,7 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
                 <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-2">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
-                      g.achieved ? "bg-emerald-500" : isOver ? "bg-amber-500" : "bg-emerald-500"
+                      isOver ? "bg-amber-500" : "bg-emerald-500"
                     }`}
                     style={{ width: `${Math.min(100, progressPct)}%` }}
                   />
@@ -153,11 +155,9 @@ export const EnergyGoals: React.FC<EnergyGoalsProps> = ({
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
                   <span>{progressPct}% of target energy threshold used</span>
                   <span className={isOver ? "text-amber-600 font-bold" : "text-emerald-700 font-bold"}>
-                    {g.achieved
-                      ? "Goal Achieved!"
-                      : isOver
-                      ? `Exceeded by +${g.currentKwh - g.targetKwh} kWh`
-                      : `${g.targetKwh - g.currentKwh} kWh remaining in budget`}
+                    {isOver
+                      ? `Exceeded by +${Math.round(effectiveCurrentKwh - g.targetKwh)} kWh`
+                      : `${Math.round(g.targetKwh - effectiveCurrentKwh)} kWh remaining in budget`}
                   </span>
                 </div>
               </div>
